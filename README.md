@@ -32,6 +32,8 @@ Ce que ça implique, et que j'assume :
 
 ## Matériel
 
+| | |
+|---|---|
 | Modèle | Hetzner AX41-1-LTD |
 | CPU | AMD Ryzen 5 3600, 6 cœurs / 12 threads |
 | RAM | 64 Go DDR4 |
