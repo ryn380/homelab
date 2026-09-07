@@ -48,9 +48,9 @@ Ce que ça implique, et que j'assume :
 ```mermaid
 graph TD
     NET[Internet] -->|WireGuard UDP| HOST
-    NET -.->|tout autre trafic entrant refusé| HOST
+    NET -.->|autre trafic entrant refusé| HOST
 
-    HOST["Hôte Proxmox — pve1<br/>IP publique<br/>pare-feu nftables + WireGuard"]
+    HOST["Hôte Proxmox — pve1<br/>IP publique<br/>nftables + WireGuard"]
 
     HOST --- BR1["vmbr1 — 10.10.10.0/24<br/>Services internes"]
     HOST --- BR2["vmbr2 — 10.10.20.0/24<br/>Bac à sable"]
