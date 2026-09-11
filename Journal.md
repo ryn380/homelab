@@ -4,7 +4,10 @@ Notes prises au fil de l'eau pendant que je monte le lab. C'est volontairement b
 
 ---
 
-## 2026-09-09
+## 2026-09-09 - Réseau : Isolation de vmbr2
+
+**Objectif**
+vmbr2 sort sur Internet, mais ne peut jamais atteindre 10.10.10.0/24.
 
 **Fait**
 - 
@@ -13,7 +16,7 @@ Notes prises au fil de l'eau pendant que je monte le lab. C'est volontairement b
 **Décisions**
 | Décisions | Raison | Contrepartie |
 |---|---|---|
-|nftables ou pve-firewall|||
+||||
 
 ## 2026-09-08 — Réseau : bridges, routage, NAT
 
@@ -35,6 +38,7 @@ Notes prises au fil de l'eau pendant que je monte le lab. C'est volontairement b
 | `oifname` plutôt que `oif` | `oif` résout le nom au chargement, la règle casse si l'interface change d'index | Un peu plus lent |
 | `/etc/nftables.conf` écrit à la main plutôt que généré avec `nft list ruleset` | Le fichier documente ce que je voulais, pas seulement ce qui tourne. Garde commentaires et noms symboliques | Il faut penser à vérifier que le chargé correspond à l'écrit |
 | Retour arrière avec `at` plutôt que `cron` | Exécution unique, c'est ce que je veux pour un filet |Aucune |
+Choix de nftables plutot que pve-firewall 
 
 **Problèmes**
 - Bloqué plusieurs heures sur la syntaxe nftables. Je venais d'iptables et le modèle est différent : nftables ne fournit aucune table ni chaîne par défaut, il faut tout déclarer.
