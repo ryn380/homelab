@@ -4,19 +4,24 @@ Notes prises au fil de l'eau pendant que je monte le lab. C'est volontairement b
 
 ---
 
-## 2026-09-09 - Réseau : Isolation de vmbr2
+## 2026-09-11 - Segmentation : Isolation de vmbr2
 
 **Objectif**
-vmbr2 sort sur Internet, mais ne peut jamais atteindre 10.10.10.0/24.
+Permettre au bridge vmbr2 d'accéder à Internet, tout en bloquant l'accès au réseau 10.10.10.0/24
 
 **Fait**
-- 
-- 
+- Edition de `/etc/nftables.conf` :
+  - Création de la table `filter`, chaîne `forward`, politique `drop` par défaut, avec règle permettant le trafic vers l'extérieur.
+  - Ajout du réseau 10.10.20.0/24 à la table `nat` via un ensemble d'adresses avec `set`.
 
 **Décisions**
 | Décisions | Raison | Contrepartie |
 |---|---|---|
 ||||
+
+**Problèmes**
+Syntaxe `set` incomplète : Il manquait le paramètre `type`, et le `flags` permettant au set de stocker des plages d'adresses.
+
 
 ## 2026-09-08 — Réseau : bridges, routage, NAT
 
