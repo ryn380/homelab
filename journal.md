@@ -3,8 +3,12 @@
 Notes prises au fil de l'eau pendant que je monte le lab. C'est volontairement brut, ce n'est pas de la documentation. Ça me sert de matière première pour rédiger les README.
 
 ---
+## 2026-09-16 - 
 
-## 2026-09-11 - Segmentation : Isolation de vmbr2
+**Problèmes**
+- Signalement informatif de la team abuse de Hetzner : `rpcbind` à l'écoute en TCP et UDP. Risque de DDOS et de divulgation d'information.  
+
+## 2026-09-11 - Segmentation : Isolation de vmbr2 (rédigé 4 jours après, certains détails perdus)
 
 **Objectif**
 Permettre au bridge vmbr2 d'accéder à Internet, tout en bloquant l'accès au réseau 10.10.10.0/24
@@ -17,11 +21,23 @@ Permettre au bridge vmbr2 d'accéder à Internet, tout en bloquant l'accès au r
 **Décisions**
 | Décisions | Raison | Contrepartie |
 |---|---|---|
-||||
+|`nftables` plutôt que `pve-firewall`|Apprendre l'outil natif sur les distributions Linux modernes. `pve-firewall` basé sur iptables|Configuration manuelle à maintenir si je passe un jour cluster|
+|Politique `drop` par défaut sur `forward`|Autoriser uniquement les services dont j'ai besoin, et bloquer tout le reste|Chaque service ajouté doit être autorisé manuellement|
+|Politique `accept` par défaut sur `input` et `output`|Décision assumée de ne pas durcir pour le moment, le durcissement viendra plus tard.|Risque d'exposition des ports ouverts|
+|Utilisation de `set` plutôt que 2 règles de masquerading.|Plus lisible et plus simple à maintenir||
+|Ajout de la règle `ct state established,related`|Autoriser le trafic de retour, sans quoi rien ne fonctionne||
 
 **Problèmes**
-Syntaxe `set` incomplète : Il manquait le paramètre `type`, et le `flags` permettant au set de stocker des plages d'adresses.
+- Syntaxe `set` incomplète : Il manquait le paramètre `type`, et le `flags` permettant au set de stocker des plages d'adresses.
+- Politique par défaut invalide sur une chaine : je tentais de mettre une `policy reject` en `forward`. Seuls `accept` et `drop` sont des politiques valides. `reject` est une action de règle.
+- Oubli du trafic de retour dans un premier temps.
+- @s1 alors que le set avait été renommé nat_networks.
+- Règle de trafic intra-vmbr1 écrite alors qu'elle ne peut jamais matcher : deux VMs sur le même bridge sont commutées, le hook forward n'est pas sollicité.
 
+**À faire**
+- Durcissement de la chaine `input`.
+- Ajouts des compteurs nftables.
+- Tests du NAT via une vraie VM.
 
 ## 2026-09-08 — Réseau : bridges, routage, NAT
 
