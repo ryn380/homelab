@@ -3,14 +3,14 @@
 Notes prises au fil de l'eau pendant que je monte le lab. C'est volontairement brut, ce n'est pas de la documentation. Ça me sert de matière première pour rédiger les README.
 
 ---
-## 2026-09-16 - 
+## 2026-09-16 - Sécurité : Restriction de RPCbind
 
 **Fait**
 - Etat des lieux pour savoir ce qui est en écoute sur les ports TCP et UDP (`ss -tulnp`).
-        - Services en écoutes en UDP : chrony (boucle locale) et rpcbind (ipv4 + ipv6).
+        - Services en écoute en UDP : chrony (boucle locale) et rpcbind (ipv4 + ipv6).
         - Services en écoutes en TCP : rpcbind (ipv4 + ipv6), ssh (ipv4 + ipv6) et services proxmox sur la boucle locale.
 - Edition de `/etc/default/rpcbind` :
-        - Ajout d'une ligne pour restreindre rpcbind à la boucle locale pour les requêtes UDP (`OPTIONS="${OPTIONS} -h 127.0.0.1 -h ::1"`).
+        - Ajout d'une ligne pour restreindre rpcbind à la boucle locale (`OPTIONS="${OPTIONS} -h 127.0.0.1 -h ::1"`).
 
 **Décisions**
 | Décisions | Raison | Contrepartie |
@@ -19,7 +19,7 @@ Notes prises au fil de l'eau pendant que je monte le lab. C'est volontairement b
 |Restreindre rpcbind plutôt que désinstaller|Dépendances Proxmox|Laisse un service en fonctionnement dont je n'ai pas l'usage. Surface d'attaque réduite mais toujours existante|
 
 **Problèmes**
-- Signalement informatif de la team abuse de Hetzner : `rpcbind` en écoute en TCP et UDP suite à l'installation de proxmox. Risque de DDOS et de divulgation d'information. Note à même de faire un état des lieux à chaque installation importante.
+- Signalement informatif de la team abuse de Hetzner : `rpcbind` en écoute en TCP et UDP suite à l'installation de proxmox. Risque de DDOS et de divulgation d'information. Noter de de faire un état des lieux à chaque installation importante.
 - Tentative de désinstallation de rpcbind car je n'utilise aucun services basés sur RPC. Désinstallation impossible à cause des dépendances Proxmox. 
 
 ## 2026-09-11 - Segmentation : Isolation de vmbr2 (rédigé 4 jours après, certains détails perdus)
