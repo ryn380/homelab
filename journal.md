@@ -10,7 +10,7 @@ Notes prises au fil de l'eau pendant que je monte le lab. C'est volontairement b
         - Services en écoute en UDP : chrony (boucle locale) et rpcbind (ipv4 + ipv6).
         - Services en écoutes en TCP : rpcbind (ipv4 + ipv6), ssh (ipv4 + ipv6) et services proxmox sur la boucle locale.
 - Edition de `/etc/default/rpcbind` :
-        - Ajout d'une ligne pour restreindre rpcbind à la boucle locale (`OPTIONS="${OPTIONS} -h 127.0.0.1 -h ::1"`).
+        - Ajout d'une ligne pour restreindre rpcbind à la boucle locale (`OPTIONS="-w -h 127.0.0.1 -h ::1"`).
 
 **Décisions**
 | Décisions | Raison | Contrepartie |
