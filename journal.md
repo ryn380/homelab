@@ -6,9 +6,9 @@ Notes prises au fil de l'eau pendant que je monte le lab. C'est volontairement b
 ## 2026-09-16 - Sécurité : Restriction de RPCbind
 
 **Fait**
-- Etat des lieux pour savoir ce qui est en écoute sur les ports TCP et UDP (`ss -tulnp`).
-        - Services en écoute en UDP : chrony (boucle locale) et rpcbind (ipv4 + ipv6).
-        - Services en écoutes en TCP : rpcbind (ipv4 + ipv6), ssh (ipv4 + ipv6) et services proxmox sur la boucle locale.
+- Etat des lieux pour savoir ce qui est en écoute sur les ports TCP et UDP (`ss -tulnp`) :
+   - Services en écoute en UDP : chrony (boucle locale) et rpcbind (ipv4 + ipv6).
+   - Services en écoutes en TCP : rpcbind (ipv4 + ipv6), ssh (ipv4 + ipv6) et services proxmox sur la boucle locale.
 - Edition de `/etc/default/rpcbind` :
         - Ajout d'une ligne pour restreindre rpcbind à la boucle locale (`OPTIONS="-w -h 127.0.0.1 -h ::1"`).
 
