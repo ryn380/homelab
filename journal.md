@@ -10,12 +10,13 @@ Notes prises au fil de l'eau pendant que je monte le lab. C'est volontairement b
         - Services en écoutes en UDP : chrony (boucle locale) et rpcbind (ipv4 + ipv6).
         - Services en écoutes en TCP : rpcbind (ipv4 + ipv6), ssh (ipv4 + ipv6) et services proxmox sur la boucle locale.
 - Edition de `/etc/default/rpcbind` :
-        - Ajout d'une ligne pour restraindre rpcbind à la boucle locale pour les requêtes UDP (`OPTIONS="${OPTIONS} -h 127.0.0.1 -h ::1"`).
+        - Ajout d'une ligne pour restreindre rpcbind à la boucle locale pour les requêtes UDP (`OPTIONS="${OPTIONS} -h 127.0.0.1 -h ::1"`).
 
 **Décisions**
 | Décisions | Raison | Contrepartie |
 |---|---|---|
-||||
+|/etc/default/rpcbind modifié|Restreindre rpcbind à la boucle locale|Fichier susceptible d'être écrasé lors d'une mise à jour.|
+|Restreindre rpcbind plutôt que désinstaller|Dépendances Proxmox|Laisse un service en fonctionnement dont je n'ai pas l'usage. Surface d'attaque réduite mais toujours existante|
 
 **Problèmes**
 - Signalement informatif de la team abuse de Hetzner : `rpcbind` en écoute en TCP et UDP suite à l'installation de proxmox. Risque de DDOS et de divulgation d'information. Note à même de faire un état des lieux à chaque installation importante.
