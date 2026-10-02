@@ -8,7 +8,8 @@ L'un des inconvénients de monter ce homelab sur une machine louée chez un four
 
 | Option | Délai | Interruption | Effort |
 |---|---|---|---|
-| Filet `at` + `ifreload` | 10 min max | Aucune | Console KVM via le support | | |
+| Filet `at` + `ifreload` | 10 min max | Aucune |
+| Console KVM via le support | | |
 | Système de secours + Reset | | |
 
 Le filet de sécurité me permettra de récupérer l'accès en moins de 10 minutes, sans redémarrage et sans dépendre de personne.
