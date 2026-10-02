@@ -4,12 +4,12 @@
 
 ## Pourquoi ce filet
 
-L'un des inconvénients de monter ce homelab sur une machine louée chez un fournisseur est que je n'ai pas d'accès à une console physique. Tout doit se faire à distance. Une modification de la configuration réseau (interfaces, adressage IP, etc.), de SSH ou du pare-feu peut donc me couper l'accès. Une perte d'accès m'obligerait à passer soit par le support Hetzner, soit par un reset matériel qui couperait toutes mes VM, suivi d'une réparation manuelle depuis un système de secours Hetzner pour accéder à une console de secours. 
+L'un des inconvénients de monter ce homelab sur une machine louée chez un fournisseur est que je n'ai pas d'accès à une console physique. Tout doit se faire à distance. Une modification de la configuration réseau (interfaces, adressage IP, etc.), de SSH ou du pare-feu peut donc me couper l'accès. Une perte d'accès m'obligerait à passer soit par le support Hetzner, soit par un reset matériel suivi d'une réparation manuelle depuis un système de secours Hetzner.
 
-| Option | Délai | Interruption | Effort |
+| Option | Délai | Interruption des VM | Effort |
 |---|---|---|---|
-| Filet `at` + `ifreload` | 10 min max | Aucune |
-| Console KVM via le support | | |
-| Système de secours + Reset | | |
+| Filet `at` + `ifreload` | 10 min max, automatique | Aucune | Aucun, tout est programmé à l'avance |
+| Console KVM via le support | Variable, selon la charge du support | Aucune | Se connecter à la console et corriger la configuration à la main |
+| Système de secours + Reset | Le temps d'un redémarrage | Oui, toutes les VM | | Monter les disques depuis un système minimal et réparer à la main |
 
-Le filet de sécurité me permettra de récupérer l'accès en moins de 10 minutes, sans redémarrage et sans dépendre de personne.
+Le filet de sécurité me permettra de récupérer l'accès en moins de 10 minutes, sans redémarrage et sans dépendre de personne contrairement aux deux autres options, qui dépendent soit du support, soit d'un redémarrage.
