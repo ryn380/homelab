@@ -12,7 +12,16 @@ L'un des inconvénients de monter ce homelab sur une machine louée chez un four
 | Console KVM via le support | Variable, selon la charge du support | Aucune | Se connecter à la console et corriger la configuration à la main |
 | Système de secours + Reset | Le temps d'un redémarrage | Oui, toutes les VM | Monter les disques depuis un système minimal et réparer à la main |
 
-Le filet de sécurité me permettra de récupérer l'accès en moins de 10 minutes, sans redémarrage et sans dépendre de personne contrairement aux deux autres options, qui dépendent soit du support, soit d'un redémarrage.
+Le filet de sécurité me permettra de récupérer l'accès en moins de 10 minutes, sans redémarrage, alors que les deux autres options dépendent soit du support, soit d'un redémarrage.
 
 ## Le principe
 
+Avant toute modification susceptible de me couper l'accès au serveur, j'arme un retour arrière différé.
+
+Dans le cas d'une modification des interfaces pour l'ajout de bridges internes par exemple, je programme la suppression du fichier de configuration et le rechargement de la configuration des interfaces. Ces deux actions se déclenchent 10 minutes après leur programmation.
+
+Une fois le retour arrière armé, je crée ce fichier de configuration et j'applique mes modifications en rechargeant la configuration des interfaces réseau. Comme je crée mon propre fichier, je n'ai rien à sauvegarder : il suffit de le supprimer.
+
+Je vérifie ensuite que la configuration a bien été prise en compte. Si tout fonctionne, j'annule le retour arrière. Sinon, le fichier que je viens de créer est supprimé et mes modifications avec lui, et la configuration des interfaces est rechargée.
+
+J'arme le retour arrière avant de créer le fichier. Comme ça, j'évite de laisser un fichier actif et non protégé, qui serait chargé au prochain redémarrage de la machine. **Ordre à retenir** : armer, modifier, appliquer, vérifier, puis annuler le filet.
