@@ -173,7 +173,7 @@ sysctl --system
 sysctl net.ipv4.ip_forward   # doit renvoyer 1
 ```
 
-Bridges internes dans `/etc/network/interfaces.d/10-bridges.conf`.
+Bridges internes dans `/etc/network/interfaces.d/10-bridges`.
 ```text
 auto vmbr1
 iface vmbr1 inet static
