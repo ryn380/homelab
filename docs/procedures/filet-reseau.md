@@ -13,3 +13,6 @@ L'un des inconvénients de monter ce homelab sur une machine louée chez un four
 | Système de secours + Reset | Le temps d'un redémarrage | Oui, toutes les VM | Monter les disques depuis un système minimal et réparer à la main |
 
 Le filet de sécurité me permettra de récupérer l'accès en moins de 10 minutes, sans redémarrage et sans dépendre de personne contrairement aux deux autres options, qui dépendent soit du support, soit d'un redémarrage.
+
+## Le principe
+
