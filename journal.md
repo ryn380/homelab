@@ -158,7 +158,7 @@ Créer deux réseaux internes pour les futures VMs, avec sortie Internet par NAT
 
 Filet de sécurité armé avant toute modification réseau.
 ```bash
-echo -e "rm -f /etc/network/interfaces.d/10-bridges.conf\n/sbin/ifreload -a" | at now + 10 minutes
+echo -e "rm -f /etc/network/interfaces.d/10-bridges\n/sbin/ifreload -a" | at now + 10 minutes
 at -l          # noter le numéro de tâche
 at -c <num>    # vérifier le contenu réel de la tâche
 ```
