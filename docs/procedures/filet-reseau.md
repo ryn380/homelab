@@ -24,4 +24,5 @@ Une fois le retour arrière armé, je crée ce fichier de configuration et j'app
 
 Je vérifie ensuite que la configuration a bien été prise en compte. Si tout fonctionne, j'annule le retour arrière. Sinon, le fichier que je viens de créer est supprimé et mes modifications avec lui, et la configuration des interfaces est rechargée.
 
-J'arme le retour arrière avant de créer le fichier. Comme ça, j'évite de laisser un fichier actif et non protégé, qui serait chargé au prochain redémarrage de la machine. **Ordre à retenir** : armer, modifier, appliquer, vérifier, puis annuler le filet.
+J'arme le retour arrière avant de créer le fichier. Comme ça, j'évite de laisser un fichier actif et non protégé, qui serait chargé au prochain redémarrage de la machine.
+**Ordre à retenir** : armer, modifier, appliquer, vérifier, puis annuler le filet.
