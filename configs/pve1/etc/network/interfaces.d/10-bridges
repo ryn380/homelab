@@ -7,7 +7,7 @@ iface vmbr1 inet static
 
 auto vmbr2
 iface vmbr2 inet static
-        address 10.10.20.1/24
-        bridge-ports none
-        bridge-stp off
-        bridge-fd 0
+	address 10.10.20.1/24
+	bridge-ports none
+	bridge-stp off
+	bridge-fd 0
