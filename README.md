@@ -1,10 +1,26 @@
 # homelab
 
-Infrastructure personnelle de test que je monte en autodidacte pour me remettre à niveau en administration système.
+Infrastructure personnelle de test que je monte en autodidacte pour me remettre à niveau en administration système. En clair : j'ai loué un serveur, je le sécurise et je documente chaque étape, y compris mes erreurs.
 
 Ce dépôt contient l'architecture, les choix techniques, les fichiers de configuration réellement en place et le journal de bord. Les projets qui produisent du code réutilisable auront leur propre dépôt, listé plus bas.
 
 **État : en construction.** La section [Avancement](#avancement) indique ce qui est réellement déployé.
+
+---
+
+## En bref
+
+| | |
+|---|---|
+| Ce que c'est | Un serveur dédié Hetzner sous Proxmox VE, exposé sur Internet, que je durcis et segmente moi-même |
+| Ce qui est en place | Accès SSH par clé uniquement, interface Proxmox non exposée (tunnel SSH), deux réseaux internes avec NAT, bac à sable isolé par filtrage |
+| Ce qui n'est pas encore là | VM, sauvegarde externalisée, supervision, automatisation (voir la [feuille de route](#feuille-de-route)) |
+
+**Par où commencer :**
+
+- [Incident rpcbind](docs/incidents/2026-09-rpcbind.md) : un port exposé signalé par le BSI, de la cause à la correction vérifiée depuis l'extérieur.
+- [Filet de sécurité réseau](docs/procedures/filet-reseau.md) : comment je modifie la configuration réseau d'une machine dont je n'ai pas l'accès physique.
+- [Journal de bord](journal.md) : mes notes de session, avec les décisions, leurs contreparties et mes erreurs.
 
 ---
 
@@ -85,14 +101,16 @@ Réservations : `.1` pour la passerelle (l'hôte), `.2` à `.9` pour l'infrastru
 |---|---|---|
 | 22/tcp | SSH | Authentification par clé uniquement |
 
-Tout le reste écoute sur la boucle locale. Vérifié avec `ss -tulnp` après chaque installation importante.
+Tout le reste écoute sur la boucle locale. Depuis l'incident rpcbind, je le vérifie avec `ss -tulnp` (TCP **et** UDP) après chaque installation importante.
+
+Contrôle depuis l'extérieur le 2026-10-24, en IPv4 uniquement (l'IPv6 n'a pas été testé) : un scan TCP complet ne montre que le port 22 ouvert, et le port 111 est fermé en UDP (voir l'[incident](docs/incidents/2026-09-rpcbind.md)).
 
 ### Règles que je m'impose
 
 1. **Aucune VM sur l'interface publique.** Le fournisseur ne route qu'une seule adresse MAC sur mon port. Une VM posée sur un bridge relié à l'interface physique enverrait des trames avec sa propre MAC, ce qui provoque un blocage du trafic et un signalement pour abus. Les bridges internes sont donc déclarés avec `bridge-ports none`, et les VMs sortent par NAT.
 2. **L'interface web de Proxmox n'est pas joignable depuis Internet.** Elle écoute uniquement sur la boucle locale et j'y accède par tunnel SSH.
 3. **Le bac à sable ne communique pas avec les services internes.** Le routage est global sur l'hôte, donc la séparation vient du filtrage : chaîne `forward` en refus par défaut, seul le trafic vers Internet est autorisé.
-4. **Je n'édite pas les fichiers qui appartiennent à un paquet ou au fournisseur.** J'ajoute les miens dans les répertoires `.d` prévus pour ça, ou je passe par une surcharge systemd. Les mises à jour ne peuvent pas écraser mes modifications.
+4. **Quand c'est possible, je n'édite pas les fichiers qui appartiennent à un paquet ou au fournisseur.** J'ajoute les miens dans les répertoires `.d` prévus pour ça, ou je passe par une surcharge systemd. Les mises à jour ne peuvent pas écraser mes modifications. Une exception : `/etc/default/rpcbind`, modifié directement par simplicité. Une surcharge du service aurait été plus propre (voir l'[incident](docs/incidents/2026-09-rpcbind.md)).
 5. **Je ne publie aucune donnée de ciblage.** Pas d'adresse IP publique, pas de nom d'hôte réel, pas de clé. Les adresses publiques sont remplacées par `203.0.113.1`.
 
 ### Ce qui n'est pas encore durci
@@ -102,6 +120,7 @@ Je préfère le lister ici plutôt que de laisser croire que c'est fait :
 - La chaîne `input` du pare-feu de l'hôte est en `policy accept`. Rien n'est exposé aujourd'hui parce que les services écoutent sur la boucle locale, mais un nouveau service mal configuré le serait. C'est la prochaine étape.
 - L'administration se fait encore en root.
 - La configuration de l'hôte n'est pas sauvegardée ailleurs que dans ce dépôt.
+- `rpcbind` tourne toujours, restreint à la boucle locale, parce que Proxmox en dépend (voir l'[incident](docs/incidents/2026-09-rpcbind.md)).
 
 ---
 
@@ -122,7 +141,9 @@ homelab/
 │           └── systemd/system/
 └── docs/
     ├── procedures/            méthodes réutilisables
+    │   └── filet-reseau.md
     └── incidents/             comptes rendus d'incident
+        └── 2026-09-rpcbind.md
 ```
 
 Les fichiers de `configs/` reprennent le chemin exact qu'ils ont sur la machine. Pas besoin d'expliquer où chacun va.
@@ -171,7 +192,8 @@ J'ai choisi cet ordre volontairement. L'accès sécurisé et le socle durci pass
 | 2026-08-20 | Serveur livré, durcissement SSH, installation de Proxmox VE sur `pve1` |
 | 2026-09-08 | Bridges internes `vmbr1` et `vmbr2`, routage IPv4, NAT |
 | 2026-09-11 | Isolation de `vmbr2` par filtrage |
-| 2026-09-16 | Signalement Hetzner / BSI : port 111 exposé |
+| 2026-09-16 | Signalement Hetzner / BSI : port 111 exposé, voir l'[incident](docs/incidents/2026-09-rpcbind.md) |
 | 2026-09-19 | `rpcbind` restreint à la boucle locale, seul SSH reste exposé |
+| 2026-10-24 | Contrôle depuis l'extérieur, en IPv4 : seul SSH est ouvert |
 
 Le détail des sessions est dans [journal.md](journal.md).

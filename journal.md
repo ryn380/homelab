@@ -6,6 +6,38 @@ Les adresses IP publiques sont remplacées par `203.0.113.1` (plage de documenta
 
 ---
 
+## 2026-10-24 - Contrôle depuis l'extérieur
+
+**Objectif**
+Vérifier, vu d'Internet, que le port 111 est bien fermé et que seul SSH est exposé. Jusqu'ici je ne l'avais vérifié que de l'intérieur, avec `ss`.
+
+**Fait**
+
+Scan TCP complet, tous les ports, depuis une machine extérieure au serveur.
+```bash
+nmap -Pn -sT -p- 203.0.113.1
+```
+Scan UDP du port 111.
+```bash
+nmap -Pn -sU -p 111 203.0.113.1
+```
+Résultats :
+- TCP : seul le 22 est ouvert, le 25 est `filtered`, les 65 533 autres ports sont fermés.
+- UDP : le 111 est `closed`.
+
+**Problèmes**
+- Le scan UDP de nmap demande des droits administrateur, que je n'avais pas sur la machine du premier test. Je l'ai relancé depuis une machine où je les avais.
+- Le port 25 apparaît `filtered`. Le `ss -tulnp` du 19/09 montre que Postfix n'écoute que sur `127.0.0.1:25` et `[::1]:25`, donc le filtrage ne vient pas de mon serveur. Origine inconnue.
+- Je n'ai pas testé l'IPv6, alors que `rpcbind` écoutait aussi sur `[::]`.
+
+**À faire**
+- Trouver l'origine du filtrage du port 25.
+- Tester l'IPv6, plus tard.
+
+Voir : [incident](docs/incidents/2026-09-rpcbind.md)
+
+---
+
 ## 2026-09-19 - Sécurité : restriction de rpcbind à la boucle locale
 
 Suite du signalement reçu le 16/09 (voir entrée précédente). Service resté arrêté 3 jours entre le signalement et la correction.
@@ -64,6 +96,7 @@ systemctl status pveproxy pvedaemon
 ssh -L 8006:127.0.0.1:8006 root@203.0.113.1
 ```
 Résultat : seul SSH reste exposé sur Internet. Proxmox tourne sans interruption depuis le 20/08, interface web accessible.
+La même sortie montre que Postfix n'écoute que sur `127.0.0.1:25` et `[::1]:25`, et que `pveproxy`, `pvedaemon`, `spiceproxy` et `chronyd` n'écoutent que sur la boucle locale. Seul `sshd` écoute sur toutes les interfaces.
 
 **Décisions**
 
@@ -82,7 +115,6 @@ Résultat : seul SSH reste exposé sur Internet. Proxmox tourne sans interruptio
 **À faire**
 - Durcissement de la chaîne `input` : il fermerait ce port et tous ceux que je ne connais pas encore.
 - Refaire un `ss -tulnp` après chaque installation importante.
-- Vérifier si un autre service de la pile Proxmox écoute au-delà de la boucle locale.
 
 ---
 
@@ -104,7 +136,8 @@ systemctl stop rpcbind.service rpcbind.socket
 
 **Problèmes**
 - Signalement informatif transmis par l'équipe abuse de Hetzner, à la suite d'un rapport du BSI allemand. `rpcbind` écoute sur le port 111 en TCP et UDP depuis Internet : risque de réflexion/amplification DDoS et divulgation des services RPC disponibles.
-- Cause racine : `rpcbind` est arrivé avec l'installation de Proxmox, pas avec l'image Hetzner. Mon état des lieux du 20/08 ne montrait que SSH, mais il était en TCP seulement (`ss -tlnp` sans le `u`) et je ne l'ai pas refait après l'installation.
+- Cause racine : `rpcbind` est arrivé avec l'installation de Proxmox, pas avec l'image Hetzner. Mon état des lieux du 20/08 a été fait avant l'installation, donc il ne pouvait pas le voir. Je ne l'ai pas refait après : c'est la cause principale.
+- Faiblesse de méthode : cet inventaire était limité au TCP (`ss -tlnp`, sans le `u`). Ça n'a rien changé ce jour-là, mais un service qui n'écouterait qu'en UDP m'aurait échappé. Même sans le `u`, un inventaire après l'installation aurait montré le port 111 en TCP.
 - Leçon : refaire un inventaire des ports après chaque installation importante, avec TCP **et** UDP.
 
 **À faire**

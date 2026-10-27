@@ -1,5 +1,8 @@
 # /etc/init.d/rpcbind
 
+# 2026-09-19 : écoute restreinte à la boucle locale suite au signalement BSI (port 111 exposé).
+# Les deux lignes OPTIONS d'origine remplacées par une seule, -w conservé.
+# Voir docs/incidents/2026-09-rpcbind.md
 OPTIONS="-w -h 127.0.0.1 -h ::1"
 
 # Cause rpcbind to do a "warm start" utilizing a state file (default)
