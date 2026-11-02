@@ -6,53 +6,6 @@ Les adresses IP publiques sont remplacées par `203.0.113.1` (plage de documenta
 
 ---
 
-## 2026-10-27 - Première VM : stockage, format de disque et fin de support
-
-**Objectif**
-Préparer la création de ma première VM : vérifier ce que le stockage `local` peut contenir, choisir le format de disque, puis télécharger l'ISO de Debian.
-
-**Fait**
-Vérification du contenu autorisé sur `local` : Datacenter → Storage → `local` → Edit, champ « Content ». Disk image y figure, avec Backup, ISO image, Container, Snippets et Container template.
-
-Recherche du fichier de configuration des stockages.
-```bash
-find / -name "storage.cfg"    # aucun résultat
-```
-`/etc/pve/storage.cfg` n'existe pas encore sur mon serveur.
-
-État des stockages.
-```bash
-pvesm status
-```
-```text
-Name	Type	Status	Total		Used	Available	%
-local	dir	active	456943168	3176208	30482056	0.70%
-```
-Un seul stockage est déclaré : `local`, de type répertoire. Les valeurs sont en Kio : environ 436 Gio au total, dont 3 Gio utilisés.
-
-En voulant télécharger l'ISO (ISO Images → Download from URL), j'ai vu un bandeau dans l'interface web de mon hyperviseur annonçant une fin de vie en août 2026. La [FAQ de Proxmox](https://pve.proxmox.com/wiki/FAQ#faq-support-table) le confirme :
-- Proxmox VE 8 : fin de vie en août 2026.
-- Debian 12 : fin du support régulier en juillet 2026. La sécurité est reprise par l'équipe LTS, jusqu'au 30 juin 2028 ([annonce Debian](https://www.debian.org/News/2026/20260712.en.html)).
-- Proxmox VE 9 repose sur Debian 13 (« trixie »), la version stable actuelle.
-
-**Décisions**
-| Décision | Raison | Contrepartie |
-| --- | --- | --- |
-| `qcow2` plutôt que `raw` pour les disques de VM | Le `raw` est une copie brute, sans en-tête ni métadonnées : performances I/O maximales mais aucune fonctionnalité. Le `qcow2` ajoute des tables d'allocation et des métadonnées, ce qui permet les instantanés, dont j'ai besoin pour tester et défaire. | Légère baisse de performance, négligeable pour un lab |
-| Passer à Proxmox VE 9 (Debian 13) avant de créer la première VM | Proxmox VE 8 n'est plus maintenu et Debian 12 n'est plus couvert que par le support LTS. Autant migrer maintenant, tant que je n'ai aucune VM à préserver | Mise à niveau à distance, sans accès physique, et sans sauvegarde de l'hôte ailleurs que dans ce dépôt. Première VM repoussée |
-
-**Problèmes**
-- Pas de fichier `/etc/pve/storage.cfg`, alors que je voulais le comparer avec ce que montre l'interface. D'après mes recherches, quand le fichier est absent, Proxmox applique une configuration par défaut : un stockage `local` sur `/var/lib/vz` qui accepte tous les types de contenu. C'est cohérent avec ce que j'observe.
-**À faire**
-- Préparer la mise à niveau : vérifier la version de PVE 8, lancer `pve8to9 --full`, régler les points qu'il remonte.
-- Après la mise à niveau : refaire l'inventaire des ports en TCP et UDP, et vérifier mes fichiers de `configs/`.
-- Mettre à jour la ligne « Hyperviseur » du README.
-- Vérifier que `/etc/pve/storage.cfg` apparaît bien après la première modification d'un stockage. C'est ce que je suppose d'après mes recherches, je ne l'ai pas encore constaté.
-- Choisir explicitement le format `qcow2` dans l'assistant de création de la VM, puis vérifier qu'un instantané est possible.
-- Créer la VM Debian sur `vmbr2` et valider le NAT en conditions réelles.
-
----
-
 ## 2026-10-24 - Contrôle depuis l'extérieur
 
 **Objectif**
